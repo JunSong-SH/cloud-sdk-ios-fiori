@@ -61,7 +61,7 @@ struct FioriToolbar<Items: IndexedViewContainer>: ViewModifier {
                         }
                     }
                 } else {
-                    if let _ = helperText {
+                    if helperText != nil {
                         helperTextView()
                             .sizeReader { size in
                                 sizeHandler.helperTextWidth = size.width
@@ -183,6 +183,7 @@ class FioriToolbarHandler: ObservableObject {
     // [index: width] when index is -1, helper text, -2 is overflow action
     var itemsWidth: [(Int, CGFloat)] = []
     
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     func calculateItemsSize() {
         self.moreActionsStartIndex = nil
         self.itemsWidth.removeAll()
@@ -263,10 +264,10 @@ class FioriToolbarHandler: ObservableObject {
                         // should use more action
                         self.needLayoutSubviews = true
                         self.moreActionsStartIndex = item.key
-                        if self.itemsWidth.count > 0 {
-                            self.itemsWidth.insert(contentsOf: [(-2, .infinity)], at: 1)
-                        } else {
+                        if self.itemsWidth.isEmpty {
                             self.itemsWidth.append((-2, .infinity))
+                        } else {
+                            self.itemsWidth.insert(contentsOf: [(-2, .infinity)], at: 1)
                         }
                         objectWillChange.send()
                         return
